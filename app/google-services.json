@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "39177286660",
+    "firebase_url": "https://medicineplus-c108b.firebaseio.com",
+    "project_id": "medicineplus-c108b",
+    "storage_bucket": "medicineplus-c108b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:39177286660:android:d60e439e6213205a",
+        "android_client_info": {
+          "package_name": "com.sarvan.medicineplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "39177286660-itnq4666ndq5dj84pi0etsa5val1purs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvbujbqMT6GOW9YVG4Srpun09-kYFnDLo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,37 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/user_list_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/pad_10dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:text="Users"
+        android:textColor="@color/black"
+        android:textSize="@dimen/chat_title_text_size"
+        android:textStyle="bold" />
+
+    <ImageButton
+        android:id="@+id/user_patient_smiley"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="@dimen/pad_10dp"
+        android:layout_marginBottom="@dimen/pad_10dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/patient_smiley" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_user_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/user_patient_smiley"
+        android:background="@color/transparent"
+        android:padding="@dimen/pad_10dp" />
+</RelativeLayout>
+

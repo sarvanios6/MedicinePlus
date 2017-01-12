@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#E64A19</color>
+    <color name="primary">#3F51B5</color>
+    <color name="primaryDark">#303F9F</color>
+    <color name="accent">#E64A19</color>
+    <color name="home_screen_button_color">#0dc7e1</color>
+    <color name="home_screen_bottom_button_color">#0dc7e1</color>
+    <color name="light_grey">#D3D3D3</color>
+    <color name="white">#fcfcfc</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="search_hint_color">#C0C0C0</color>
+    <color name="department_list_text_clr">#2d96e6</color>
+    <color name="profile_text_color">#38a4f5</color>
+</resources>
