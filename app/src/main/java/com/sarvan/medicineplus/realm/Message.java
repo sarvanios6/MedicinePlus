@@ -15,9 +15,10 @@ public class Message {
     public Message() {
     }
 
-    public Message(String message, String messagerName) {
+    public Message(String message, String messagerName,long date) {
         this.message = message;
         this.messagerName = messagerName;
+        this.messageDate = date;
     }
 
     public String getId() {

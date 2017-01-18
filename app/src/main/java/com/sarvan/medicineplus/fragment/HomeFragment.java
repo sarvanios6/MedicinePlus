@@ -27,7 +27,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        String[] doctorList = {"Department One", "Department Two", "Department Three", "Department Four"};
+        String[] doctorList = {"Department_one", "Department_two", "Department_three", "Department_four"};
         RelativeLayout doctorLayout = (RelativeLayout) view.findViewById(R.id.ask_doctor_layout);
         RecyclerView recyclerViewDoctorList = (RecyclerView) view.findViewById(R.id.recycler_view_doctor_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());

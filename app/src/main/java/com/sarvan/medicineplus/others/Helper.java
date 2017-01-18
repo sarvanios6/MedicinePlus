@@ -17,10 +17,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.sarvan.medicineplus.R;
 import com.sarvan.medicineplus.activity.SignInActivity;
 import com.sarvan.medicineplus.realm.ChatMessage;
-import com.sarvan.medicineplus.realm.Users;
 import com.sarvan.medicineplus.realm.UsersRealm;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -89,5 +91,30 @@ public class Helper {
             users.add(user);
         }
         return users;
+    }
+
+    /**
+     * This method is used to get the time when the post is updated.
+     *
+     * @return timeStamp Time difference current time and date and date of post.
+     */
+    public static String getTimeStamp(long timeStamp) {
+//        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat millSecFormat = new SimpleDateFormat("HH:mm");
+        Date currentDate = new Date();
+        String currentTime = sdf.format(new Date());
+        Date resultdate = new Date(timeStamp);
+        // Getting current date and time
+        try {
+            currentDate = sdf.parse(currentTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if (currentDate != null) {
+            return "Today " + millSecFormat.format(resultdate);
+        } else {
+            return sdf.format(resultdate);
+        }
     }
 }

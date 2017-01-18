@@ -32,10 +32,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.sarvan.medicineplus.R;
-import com.sarvan.medicineplus.realm.ChatMessage;
+import com.sarvan.medicineplus.others.Helper;
 import com.sarvan.medicineplus.realm.Message;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,17 +46,13 @@ import io.realm.Realm;
 
 public class AskDoctorActivity extends AppCompatActivity {
     private RecyclerView recyclerViewChat;
-    private ArrayList<ChatMessage> messagesList;
     private FirebaseRecyclerAdapter<Message, MessageViewHolder> conversationAdapter;
     private String departmentName = "";
-    private String adminUser = "";
-    private ChatMessage chatMessage;
     private Message message;
     private DatabaseReference databaseReference;
-    private FirebaseUser firebaseUser;
-    private String currentUser = "";
+    private FirebaseUser mFirebaseUser;
     private String mUserName = "anonymous";
-    private Realm realm;
+    private String mUserID;
     private Button sendButton;
     private EditText messageEditText;
     private LinearLayoutManager mLinearLayoutManager;
@@ -65,34 +60,41 @@ public class AskDoctorActivity extends AppCompatActivity {
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     public static final String MESSAGES_CHILD = "messages";
     private static final String MESSAGE_URL = "http://friendlychat.firebase.google.com/message/";
+    private String messageUrl = "https://medicineplus-c108b.firebaseio.com/";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView;
         public TextView messengerTextView;
+        public TextView messengerDateTextView;
 
         public MessageViewHolder(View v) {
             super(v);
             messageTextView = (TextView) itemView.findViewById(R.id.chat_message_tv);
             messengerTextView = (TextView) itemView.findViewById(R.id.chat_messager_name);
+            messengerDateTextView = (TextView) itemView.findViewById(R.id.date_show_tv);
         }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Intent intent = getIntent();
-//        if (intent != null) {
-//            String userId = intent.getStringExtra("userId");
-//            currentUser = intent.getStringExtra("currentUser") + "_" + userId;
-//            departmentName = intent.getStringExtra("department");
-//            adminUser = intent.getStringExtra("departmentName");
-//        }
-
         setContentView(R.layout.activity_ask_doctor);
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        realm = Realm.getDefaultInstance();
+        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (mFirebaseUser == null) {
+            // Not signed in, launch the Sign In activity
+            startActivity(new Intent(this, SignInActivity.class));
+            finish();
+            return;
+        }
+        Intent intent = getIntent();
+        if (intent != null) {
+            mUserName = mFirebaseUser.getDisplayName();
+            mUserID = mUserName + "_" + mFirebaseUser.getUid();
+            departmentName = intent.getStringExtra("department");
+            messageUrl = messageUrl + departmentName + mUserID + "/messages/";
+        }
         message = new Message();
         messageEditText = (EditText) findViewById(R.id.chat_msg_edit_text);
         sendButton = (Button) findViewById(R.id.chatSendButton);
@@ -108,7 +110,7 @@ public class AskDoctorActivity extends AppCompatActivity {
                 Message.class,
                 R.layout.chat_item,
                 MessageViewHolder.class,
-                databaseReference.child(MESSAGES_CHILD)) {
+                databaseReference.child(departmentName).child(mUserID).child(MESSAGES_CHILD)) {
             @Override
             protected Message parseSnapshot(DataSnapshot snapshot) {
                 Message message = super.parseSnapshot(snapshot);
@@ -122,6 +124,8 @@ public class AskDoctorActivity extends AppCompatActivity {
             protected void populateViewHolder(MessageViewHolder viewHolder, Message message, int position) {
                 viewHolder.messageTextView.setText(message.getMessage());
                 viewHolder.messengerTextView.setText(message.getMessagerName());
+                String date = Helper.getTimeStamp(message.getMessageDate());
+                viewHolder.messengerDateTextView.setText(date);
 //                if (message.getPhotoUrl() == null) {
 //                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(AskDoctorActivity.this,
 //                            R.drawable.ic_account_circle_black_36dp));
@@ -177,11 +181,12 @@ public class AskDoctorActivity extends AppCompatActivity {
 
         // Fetch remote config.
         fetchConfig();
+
 //        messageEditText.setFilters(new InputFilter[]{
 //                new InputFilter.LengthFilter(mSharedPreferences
 //                        .getInt(CodelabPreferences.FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT))
 //        });
-//        mMessageEditText.addTextChangedListener(new TextWatcher() {
+//        messageEditText.addTextChangedListener(new TextWatcher() {
 //            @Override
 //            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 //            }
@@ -194,65 +199,17 @@ public class AskDoctorActivity extends AppCompatActivity {
 //                    mSendButton.setEnabled(false);
 //                }
 //            }
-
+//
 //            @Override
 //            public void afterTextChanged(Editable editable) {
 //            }
 //        });
-//        conversationAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-//            @Override
-//            public void onItemRangeInserted(int positionStart, int itemCount) {
-//                super.onItemRangeInserted(positionStart, itemCount);
-//                int friendlyMessageCount = conversationAdapter.getItemCount();
-//                int lastVisiblePosition = manager.findLastCompletelyVisibleItemPosition();
-////                 If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
-////                 to the bottom of the list to show the newly added message.
-//                if (lastVisiblePosition == -1 ||
-//                        (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
-//                    mMessageRecyclerView.scrollToPosition(positionStart);
-//                }
-//            }
-//        });
-//        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-//        mMessageRecyclerView.setAdapter(mFirebaseAdapter);
-//        messagesList = Helper.getAllMessages(departmentName);
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-//        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-//        linearLayoutManager.setStackFromEnd(true);
-//        recyclerViewChat.setLayoutManager(linearLayoutManager);
-//        recyclerViewChat.setItemAnimator(new DefaultItemAnimator());
-//        conversationAdapter = new ConversationAdapter(this, messagesList, departmentName);
-//        recyclerViewChat.setAdapter(conversationAdapter);
-//        recyclerViewChat.smoothScrollToPosition(conversationAdapter.getItemCount());
-//
-//        sendButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (messageEditText.getText().length() > 0 && !TextUtils.isEmpty(adminUser)) {
-//                    message.setMessage(messageEditText.getText().toString());
-//                    message.setMessageDate(System.currentTimeMillis());
-//                    message.setMessagerName(firebaseUser.getDisplayName());
-//                    message.setDepartmentName(departmentName);
-//                    databaseReference.child("Medicine_plus").child(adminUser).child("message").child(currentUser).setValue(message);
-//                    messageEditText.setText("");
-//                    addMesssageChangeListener();
-//                } else if (messageEditText.getText().length() > 0) {
-//                    currentUser = firebaseUser.getDisplayName() + "_" + firebaseUser.getUid();
-//                    message.setMessage(messageEditText.getText().toString());
-//                    message.setMessageDate(System.currentTimeMillis());
-//                    message.setMessagerName(firebaseUser.getDisplayName());
-//                    message.setDepartmentName(departmentName);
-//                    databaseReference.child("Medicine_plus").child(departmentName).child("message").child(currentUser).setValue(message);
-//                    messageEditText.setText("");
-//                    addMesssageChangeListener();
-//                }
-//            }
-//        });
+
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Message message = new Message(messageEditText.getText().toString(), mUserName);
-                databaseReference.child(MESSAGES_CHILD).push().setValue(message);
+                Message message = new Message(messageEditText.getText().toString(), mUserName, System.currentTimeMillis());
+                databaseReference.child(departmentName).child(mUserID).child(MESSAGES_CHILD).push().setValue(message);
                 messageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
             }
@@ -274,40 +231,11 @@ public class AskDoctorActivity extends AppCompatActivity {
                 finish();
             }
         });
-
     }
 
-    /**
-     * User data change listener
-     */
-//    private void addMesssageChangeListener() {
-//        // User data change listener
-//        databaseReference.child("Medicine_plus").child(departmentName).child(currentUser).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                message = dataSnapshot.getValue(Message.class);
-//                if (message.getMessage().length() > 0) {
-//                    chatMessage.setMessagerName(message.getMessage());
-//                    chatMessage.setMessagerName(message.getMessagerName());
-//                    chatMessage.setMessageDate(message.getMessageDate());
-//                    Realm realm = Realm.getDefaultInstance();
-//                    realm.beginTransaction();
-//                    realm.copyToRealm(chatMessage);
-//                    realm.commitTransaction();
-//                    conversationAdapter.updateMessage();
-//                    recyclerViewChat.smoothScrollToPosition(conversationAdapter.getItemCount());
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.e("AskDoctorActivity", databaseError.getMessage());
-//            }
-//        });
-//    }
     private Action getMessageViewAction(Message friendlyMessage) {
         return new Action.Builder(Action.Builder.VIEW_ACTION)
-                .setObject(friendlyMessage.getMessagerName(), MESSAGE_URL.concat(friendlyMessage.getId()))
+                .setObject(friendlyMessage.getMessagerName(), messageUrl.concat(friendlyMessage.getId()))
                 .setMetadata(new Action.Metadata.Builder().setUpload(false))
                 .build();
     }
@@ -316,15 +244,15 @@ public class AskDoctorActivity extends AppCompatActivity {
         PersonBuilder sender = Indexables.personBuilder()
                 .setIsSelf(mUserName == friendlyMessage.getMessagerName())
                 .setName(friendlyMessage.getMessage())
-                .setUrl(MESSAGE_URL.concat(friendlyMessage.getId() + "/sender"));
+                .setUrl(messageUrl.concat(friendlyMessage.getId() + "/sender"));
 
         PersonBuilder recipient = Indexables.personBuilder()
                 .setName(mUserName)
-                .setUrl(MESSAGE_URL.concat(friendlyMessage.getId() + "/recipient"));
+                .setUrl(messageUrl.concat(friendlyMessage.getId() + "/recipient"));
 
         Indexable messageToIndex = Indexables.messageBuilder()
                 .setName(friendlyMessage.getMessage())
-                .setUrl(MESSAGE_URL.concat(friendlyMessage.getId()))
+                .setUrl(messageUrl.concat(friendlyMessage.getId()))
                 .setSender(sender)
                 .setRecipient(recipient)
                 .build();
