@@ -15,7 +15,8 @@ public class Message {
     public Message() {
     }
 
-    public Message(String message, String messagerName,long date) {
+    public Message(String id, String message, String messagerName, long date) {
+        this.id = id;
         this.message = message;
         this.messagerName = messagerName;
         this.messageDate = date;

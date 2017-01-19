@@ -85,7 +85,7 @@ public class Helper {
         ArrayList<UsersRealm> users = new ArrayList<>();
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-        RealmResults<UsersRealm> allUsers = realm.where(UsersRealm.class).findAll();
+        RealmResults<UsersRealm> allUsers = realm.where(UsersRealm.class).equalTo("departmentName", departmentName).findAll();
         realm.commitTransaction();
         for (UsersRealm user : allUsers) {
             users.add(user);

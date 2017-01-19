@@ -68,9 +68,4 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             dateTv = (TextView) itemView.findViewById(R.id.date_show_tv);
         }
     }
-
-    public void updateMessage() {
-        this.messages = Helper.getAllMessages(departmentName);
-        notifyDataSetChanged();
-    }
 }

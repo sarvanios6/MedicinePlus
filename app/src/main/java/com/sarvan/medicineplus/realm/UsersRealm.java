@@ -8,11 +8,29 @@ import io.realm.annotations.PrimaryKey;
  */
 
 public class UsersRealm extends RealmObject {
-    private String name;
-    private String email;
-    private String photoUrl;
     @PrimaryKey
     private String channel;
+    private String name;
+    private String departmentName;
+
+    public UsersRealm() {
+
+    }
+
+    public UsersRealm(String channel, String name,String departmentName) {
+        this.channel = channel;
+        this.name = name;
+        this.departmentName = departmentName;
+    }
+
+    public String getChannel() {
+
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
 
     public String getName() {
         return name;
@@ -22,27 +40,11 @@ public class UsersRealm extends RealmObject {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
-
-    public String getChannel() {
-        return channel;
-    }
-
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public String getDepartmentName() {
+        return departmentName;
     }
 }

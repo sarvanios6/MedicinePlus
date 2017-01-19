@@ -7,17 +7,28 @@ import io.realm.RealmObject;
  */
 
 public class ChatMessage extends RealmObject {
+    private String id;
     private String message;
     private long messageDate;
     private String messagerName;
     private String departmentName;
+    private String photoUrl;
 
-    public String getDepartmentName() {
-        return departmentName;
+    public ChatMessage() {
     }
 
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
+    public ChatMessage(String message, String messagerName,long date) {
+        this.message = message;
+        this.messagerName = messagerName;
+        this.messageDate = date;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getMessage() {
@@ -42,5 +53,21 @@ public class ChatMessage extends RealmObject {
 
     public void setMessagerName(String messagerName) {
         this.messagerName = messagerName;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }

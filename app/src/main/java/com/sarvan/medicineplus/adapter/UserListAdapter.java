@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.sarvan.medicineplus.R;
 import com.sarvan.medicineplus.activity.AskDoctorActivity;
 import com.sarvan.medicineplus.activity.SignInActivity;
+import com.sarvan.medicineplus.others.Helper;
 import com.sarvan.medicineplus.realm.UsersRealm;
 
 import java.util.ArrayList;
@@ -63,16 +64,26 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                         context.startActivity(new Intent(context, SignInActivity.class));
                     } else {
                         String userId = firebaseUser.getUid();
-                        String currentUser = userList.get(getAdapterPosition()).getName();
+                        String currentUser = userList.get(getAdapterPosition()).getName()+"_"+userList.get(getAdapterPosition()).getChannel();
                         Intent intent = new Intent(context, AskDoctorActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra("userId", userId);
                         intent.putExtra("currentUser", currentUser);
                         intent.putExtra("departmentName", departmentName);
                         context.startActivity(intent);
+//                        String userId = firebaseUser.getUid();
+//                        Intent intent = new Intent(context, AskDoctorActivity.class);
+//                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        intent.putExtra("userId", userId);
+//                        intent.putExtra("department", doctorNameList[getAdapterPosition()]);
+//                        context.startActivity(intent);
                     }
                 }
             });
         }
+    }
+
+    public void updateList() {
+        userList = Helper.getAllUsers(departmentName);
     }
 }

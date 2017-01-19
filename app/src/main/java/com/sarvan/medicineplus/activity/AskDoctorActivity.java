@@ -59,7 +59,6 @@ public class AskDoctorActivity extends AppCompatActivity {
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     public static final String MESSAGES_CHILD = "messages";
-    private static final String MESSAGE_URL = "http://friendlychat.firebase.google.com/message/";
     private String messageUrl = "https://medicineplus-c108b.firebaseio.com/";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
 
@@ -80,20 +79,26 @@ public class AskDoctorActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ask_doctor);
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+        Intent intent = getIntent();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (intent != null && mFirebaseUser != null) {
+            if (mFirebaseUser.getDisplayName().equalsIgnoreCase("sarvan kumar")) {
+                mUserID = intent.getStringExtra("currentUser");
+                departmentName = intent.getStringExtra("departmentName");
+                messageUrl = messageUrl + departmentName + mUserID + "/messages/";
+            } else {
+                mUserName = mFirebaseUser.getDisplayName();
+                mUserID = mUserName + "_" + mFirebaseUser.getUid();
+                departmentName = intent.getStringExtra("department");
+                messageUrl = messageUrl + departmentName + mUserID + "/messages/";
+            }
+        }
+        databaseReference = FirebaseDatabase.getInstance().getReference(departmentName);
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
-        }
-        Intent intent = getIntent();
-        if (intent != null) {
-            mUserName = mFirebaseUser.getDisplayName();
-            mUserID = mUserName + "_" + mFirebaseUser.getUid();
-            departmentName = intent.getStringExtra("department");
-            messageUrl = messageUrl + departmentName + mUserID + "/messages/";
         }
         message = new Message();
         messageEditText = (EditText) findViewById(R.id.chat_msg_edit_text);
@@ -110,7 +115,7 @@ public class AskDoctorActivity extends AppCompatActivity {
                 Message.class,
                 R.layout.chat_item,
                 MessageViewHolder.class,
-                databaseReference.child(departmentName).child(mUserID).child(MESSAGES_CHILD)) {
+                databaseReference.child(mUserID).child(MESSAGES_CHILD)) {
             @Override
             protected Message parseSnapshot(DataSnapshot snapshot) {
                 Message message = super.parseSnapshot(snapshot);
@@ -208,10 +213,19 @@ public class AskDoctorActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Message message = new Message(messageEditText.getText().toString(), mUserName, System.currentTimeMillis());
-                databaseReference.child(departmentName).child(mUserID).child(MESSAGES_CHILD).push().setValue(message);
-                messageEditText.setText("");
-                mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+                if (messageEditText.getText().toString().length() > 0) {
+                    if (mFirebaseUser.getDisplayName().equalsIgnoreCase("sarvan kumar")) {
+                        Message message = new Message(mUserID, messageEditText.getText().toString(), mFirebaseUser.getDisplayName(), System.currentTimeMillis());
+                        databaseReference.child(mUserID).child(MESSAGES_CHILD).push().setValue(message);
+                        messageEditText.setText("");
+                        mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+                    } else {
+                        Message message = new Message(mUserID, messageEditText.getText().toString(), mUserName, System.currentTimeMillis());
+                        databaseReference.child(mUserID).child(MESSAGES_CHILD).push().setValue(message);
+                        messageEditText.setText("");
+                        mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+                    }
+                }
             }
         });
 

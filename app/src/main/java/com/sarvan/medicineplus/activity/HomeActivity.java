@@ -135,14 +135,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            Users users = postSnapshot.getValue(Users.class);
-                            usersRealm.setName(users.getName());
-                            usersRealm.setChannel(users.getChannel());
-                            usersRealm.setEmail(users.getEmail());
-                            usersRealm.setPhotoUrl(users.getphotoUrl());
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(usersRealm);
-                            realm.commitTransaction();
+//                            Users users = postSnapshot.getValue(Users.class);
+//                            usersRealm.setChannel(users.getChannel());
+//                            realm.beginTransaction();
+//                            realm.copyToRealmOrUpdate(usersRealm);
+//                            realm.commitTransaction();
                         }
                     }
 
