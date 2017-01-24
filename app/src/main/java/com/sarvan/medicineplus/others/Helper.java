@@ -17,12 +17,15 @@ import com.google.firebase.auth.FirebaseUser;
 import com.sarvan.medicineplus.R;
 import com.sarvan.medicineplus.activity.SignInActivity;
 import com.sarvan.medicineplus.realm.ChatMessage;
+import com.sarvan.medicineplus.realm.DoctorRealm;
 import com.sarvan.medicineplus.realm.UsersRealm;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -69,6 +72,60 @@ public class Helper {
         signInDialog.show();
     }
 
+    /**
+     * This method is used to get the time when the post is updated.
+     *
+     * @return timeStamp Time difference current time and date and date of post.
+     */
+    public static String getChatTimeStamp(String timeStamp) {
+        // Getting date and time from JSON
+        TimeZone currentTimeZone = TimeZone.getDefault();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date utcToLocalDate = new Date();
+        Date currentDate = new Date();
+        Date localTime = new Date();
+        String currentTime = dateFormat.format(new Date());
+        String utcToLocalDateString = null;
+        try {
+            // Set Current Time Zone Format
+            SimpleDateFormat localDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            localDateFormat.setTimeZone(currentTimeZone);
+            utcToLocalDate = localDateFormat.parse(timeStamp);
+            String utcToLocalString = localDateFormat.format(utcToLocalDate);
+            // Set UTC time zone and convert to Local date
+            SimpleDateFormat utcDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            localTime = utcDateFormat.parse(utcToLocalString);
+            utcToLocalDateString = localDateFormat.format(utcToLocalDate);
+            // Getting current date and time
+            currentDate = dateFormat.parse(currentTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        //in milliseconds
+        if (currentDate != null && utcToLocalDate != null) {
+            long timeDiff = currentDate.getTime() - utcToLocalDate.getTime();
+            long diffDays = timeDiff / (24 * 60 * 60 * 1000);
+            if (diffDays >= 2) {
+                return new SimpleDateFormat("dd MMM yyyy hh:mm").format(localTime);
+            } else if (diffDays >= 1) {
+                String[] times = utcToLocalDateString.split(" ");
+                String time = times[1];
+                int lastIndex = time.lastIndexOf(":");
+                String hMTime = time.substring(0, lastIndex);
+                return "Yesterday " + hMTime;
+            } else {
+                String[] times = utcToLocalDateString.split(" ");
+                String time = times[1];
+                int lastIndex = time.lastIndexOf(":");
+                String hMTime = time.substring(0, lastIndex);
+                return "Today " + hMTime;
+            }
+        } else {
+            return "";
+        }
+    }
+
     public static ArrayList<ChatMessage> getAllMessages(String departmentName) {
         ArrayList<ChatMessage> messages = new ArrayList<>();
         Realm realm = Realm.getDefaultInstance();
@@ -81,12 +138,32 @@ public class Helper {
         return messages;
     }
 
+    // Get Admin User
+    public static boolean isAdminUsers(String id) {
+        Realm realm = Realm.getDefaultInstance();
+        DoctorRealm adminUserRealm = realm.where(DoctorRealm.class).equalTo("channel",id).findFirst();
+        if (null != adminUserRealm) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Get Admin User
+    public static boolean isUsers(String userId) {
+        Realm realm = Realm.getDefaultInstance();
+        UsersRealm adminUserRealm = realm.where(UsersRealm.class).equalTo("channel", userId).findFirst();
+        if (null != adminUserRealm) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    // Get All users
     public static ArrayList<UsersRealm> getAllUsers(String departmentName) {
         ArrayList<UsersRealm> users = new ArrayList<>();
         Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
         RealmResults<UsersRealm> allUsers = realm.where(UsersRealm.class).equalTo("departmentName", departmentName).findAll();
-        realm.commitTransaction();
         for (UsersRealm user : allUsers) {
             users.add(user);
         }
@@ -99,7 +176,6 @@ public class Helper {
      * @return timeStamp Time difference current time and date and date of post.
      */
     public static String getTimeStamp(long timeStamp) {
-//        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         SimpleDateFormat millSecFormat = new SimpleDateFormat("HH:mm");
         Date currentDate = new Date();

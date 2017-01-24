@@ -45,11 +45,11 @@
             android:name=".activity.AskDoctorActivity"
             android:label="@string/activity_ask_doctor"
             android:launchMode="singleTop"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".activity.SignInActivity"
             android:label="@string/activity_ask_doctor" />
-        <activity android:name=".SignInActivity" />
 
         <service
             android:name=".others.MyFirebaseInstanceIdService"

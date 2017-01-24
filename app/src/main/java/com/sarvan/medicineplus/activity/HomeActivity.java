@@ -38,6 +38,7 @@ import com.sarvan.medicineplus.fragment.HomeFragment;
 import com.sarvan.medicineplus.fragment.NewsFragment;
 import com.sarvan.medicineplus.fragment.SettingFragment;
 import com.sarvan.medicineplus.others.Helper;
+import com.sarvan.medicineplus.realm.DoctorRealm;
 import com.sarvan.medicineplus.realm.Users;
 import com.sarvan.medicineplus.realm.UsersRealm;
 
@@ -61,6 +62,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final String TAG_ABOUT_US = "about_us";
     private static final String TAG_CONTACT_US = "contact_us";
     public static String CURRENT_TAG = TAG_HOME;
+    private static final String ADMIN_TAG = "Admin";
 
     private static final String urlNavHeaderBg = "http://www.noormedical.com/files/credentialing.jpg";
     private static final String urlProfileImg = "https://cdn6.f-cdn.com/ppic/42449860/logo/10996896/wrUMb/profile_logo_.jpg";
@@ -126,29 +128,51 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         firebaseInstance.getReference(MEDICINE_PLUS);
         // Get reference to user node
         mFirebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        // Admin user Upadated
+        if (mFirebaseUser != null) {
+            // update user list name
+            mFirebaseDatabaseRef.child(MEDICINE_PLUS).child(ADMIN_TAG).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String adminUserId = (String) dataSnapshot.getValue();
+                    if (mFirebaseUser.getUid().equals(adminUserId)) {
+                        DoctorRealm adminUser = new DoctorRealm(adminUserId, mFirebaseUser.getDisplayName(), mFirebaseUser.getPhotoUrl().toString(),"department","Admin");
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(adminUser);
+                        realm.commitTransaction();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("HomeViewActivity", databaseError.getMessage());
+                }
+            });
+        }
+        // User Details Update
         if (mFirebaseUser != null) {
             Users users = new Users(mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail(), mFirebaseUser.getPhotoUrl().toString(), mFirebaseUser.getUid());
             mFirebaseDatabaseRef.child(MEDICINE_PLUS).child("Users").child(mFirebaseUser.getDisplayName() + "_" + mFirebaseUser.getUid()).setValue(users);
             // update user list name
-            if (mFirebaseUser.getDisplayName().equalsIgnoreCase("sarvan kumar")) {
-                mFirebaseDatabaseRef.child(MEDICINE_PLUS).child("Users").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                            Users users = postSnapshot.getValue(Users.class);
-//                            usersRealm.setChannel(users.getChannel());
-//                            realm.beginTransaction();
-//                            realm.copyToRealmOrUpdate(usersRealm);
-//                            realm.commitTransaction();
-                        }
+            mFirebaseDatabaseRef.child(MEDICINE_PLUS).child("Users").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        Users users = postSnapshot.getValue(Users.class);
+                        usersRealm.setChannel(users.getChannel());
+                        usersRealm.setName(users.getName());
+                        usersRealm.setPhotoUrl(users.getphotoUrl());
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(usersRealm);
+                        realm.commitTransaction();
                     }
+                }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e("HomeViewActivity", databaseError.getMessage());
-                    }
-                });
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("HomeViewActivity", databaseError.getMessage());
+                }
+            });
         }
     }
 

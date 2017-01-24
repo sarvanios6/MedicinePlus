@@ -4,29 +4,31 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * Created by Sarvan on 29/12/16.
+ * Created by Sarvan on 23/01/17.
  */
 
-public class UsersRealm extends RealmObject {
+public class DoctorRealm extends RealmObject {
+
     @PrimaryKey
     private String channel;
     private String name;
     private String photoUrl;
     private String departmentName;
+    private String admin;
 
-    public UsersRealm() {
+    public DoctorRealm() {
 
     }
 
-    public UsersRealm(String channel, String name,String departmentName,String photoUrl) {
+    public DoctorRealm(String channel, String name, String photoUrl, String departmentName, String admin) {
         this.channel = channel;
         this.name = name;
-        this.departmentName = departmentName;
         this.photoUrl = photoUrl;
+        this.departmentName = departmentName;
+        this.admin = admin;
     }
 
     public String getChannel() {
-
         return channel;
     }
 
@@ -42,19 +44,27 @@ public class UsersRealm extends RealmObject {
         this.name = name;
     }
 
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-
-    public String getDepartmentName() {
-        return departmentName;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
 
-    public String getPhotoUrl() {
-        return photoUrl;
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
     }
 }

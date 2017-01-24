@@ -1,5 +1,6 @@
 package com.sarvan.medicineplus.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -56,12 +57,9 @@ public class UsersListActivity extends AppCompatActivity {
         ImageButton patientSmiley = (ImageButton) findViewById(R.id.user_patient_smiley);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerViewUserList.setLayoutManager(linearLayoutManager);
+
+        departmentUsers();
         userList = Helper.getAllUsers(departmentName);
-//        if (userList.size() < 0) {
-//            patientSmiley.setVisibility(View.INVISIBLE);
-//        } else {
-//            patientSmiley.setVisibility(View.VISIBLE);
-//        }
         patientSmiley.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,14 +69,16 @@ public class UsersListActivity extends AppCompatActivity {
                         realm.deleteAll();
                     }
                 });
+                finish();
             }
         });
         adapter = new UserListAdapter(this, userList, departmentName);
         recyclerViewUserList.setAdapter(adapter);
-        departmentUsers();
     }
 
     private void departmentUsers() {
+        final ProgressDialog progressBar = new ProgressDialog(this);
+        progressBar.show();
         // Initialize Firebase Auth and database
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
@@ -92,11 +92,12 @@ public class UsersListActivity extends AppCompatActivity {
                 for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
                     String usersWithMessage = noteDataSnapshot.getKey();
                     String name[] = usersWithMessage.split("_");
-                    usersRealm = new UsersRealm(name[1], name[0],departmentName);
+                    usersRealm = new UsersRealm(name[1], name[0], departmentName,null);
                     realm.beginTransaction();
                     realm.copyToRealmOrUpdate(usersRealm);
                     realm.commitTransaction();
                 }
+                progressBar.dismiss();
                 adapter.updateList();
             }
 

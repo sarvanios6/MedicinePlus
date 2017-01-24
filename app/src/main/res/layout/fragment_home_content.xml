@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/ask_doctor"
-    tools:context="info.androidhive.navigationdrawer.fragment.HomeFragment">
+    >
 
     <RelativeLayout
         android:id="@+id/ask_doctor_layout"

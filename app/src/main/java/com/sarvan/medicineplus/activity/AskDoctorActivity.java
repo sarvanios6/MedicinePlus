@@ -6,12 +6,14 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputFilter;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -35,6 +37,8 @@ import com.sarvan.medicineplus.R;
 import com.sarvan.medicineplus.others.Helper;
 import com.sarvan.medicineplus.realm.Message;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +58,7 @@ public class AskDoctorActivity extends AppCompatActivity {
     private String mUserName = "anonymous";
     private String mUserID;
     private Button sendButton;
-    private EditText messageEditText;
+    private MultiAutoCompleteTextView messageEditText;
     private LinearLayoutManager mLinearLayoutManager;
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
@@ -63,15 +67,25 @@ public class AskDoctorActivity extends AppCompatActivity {
     private static final String MESSAGE_SENT_EVENT = "message_sent";
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        public TextView messageTextView;
-        public TextView messengerTextView;
-        public TextView messengerDateTextView;
+        private TextView messageTextView;
+        private TextView messengerTextView;
+        private TextView messengerDateTextView;
+        private TextView messageTextViewRgt;
+        private TextView messengerTextViewRgt;
+        private TextView messengerDateTextViewRgt;
+        private LinearLayout leftLL;
+        private LinearLayout rightLL;
 
         public MessageViewHolder(View v) {
             super(v);
             messageTextView = (TextView) itemView.findViewById(R.id.chat_message_tv);
             messengerTextView = (TextView) itemView.findViewById(R.id.chat_messager_name);
             messengerDateTextView = (TextView) itemView.findViewById(R.id.date_show_tv);
+            messageTextViewRgt = (TextView) itemView.findViewById(R.id.chat_message_tv_right);
+            messengerTextViewRgt = (TextView) itemView.findViewById(R.id.chat_messager_name_right);
+            messengerDateTextViewRgt = (TextView) itemView.findViewById(R.id.date_show_tv_right);
+            leftLL = (LinearLayout) itemView.findViewById(R.id.left_layout);
+            rightLL = (LinearLayout) itemView.findViewById(R.id.right_layout);
         }
     }
 
@@ -82,7 +96,7 @@ public class AskDoctorActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (intent != null && mFirebaseUser != null) {
-            if (mFirebaseUser.getDisplayName().equalsIgnoreCase("sarvan kumar")) {
+            if (Helper.isAdminUsers(mFirebaseUser.getUid())) {
                 mUserID = intent.getStringExtra("currentUser");
                 departmentName = intent.getStringExtra("departmentName");
                 messageUrl = messageUrl + departmentName + mUserID + "/messages/";
@@ -101,7 +115,7 @@ public class AskDoctorActivity extends AppCompatActivity {
             return;
         }
         message = new Message();
-        messageEditText = (EditText) findViewById(R.id.chat_msg_edit_text);
+        messageEditText = (MultiAutoCompleteTextView) findViewById(R.id.chat_msg_edit_text);
         sendButton = (Button) findViewById(R.id.chatSendButton);
         ImageButton doctorSmiley = (ImageButton) findViewById(R.id.doctor_smiley);
         TextView departmentTv = (TextView) findViewById(R.id.chat_title_tv);
@@ -120,17 +134,28 @@ public class AskDoctorActivity extends AppCompatActivity {
             protected Message parseSnapshot(DataSnapshot snapshot) {
                 Message message = super.parseSnapshot(snapshot);
                 if (message != null) {
-                    message.setId(snapshot.getKey());
+                    message.setUserId(snapshot.getKey());
                 }
                 return message;
             }
 
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder, Message message, int position) {
-                viewHolder.messageTextView.setText(message.getMessage());
-                viewHolder.messengerTextView.setText(message.getMessagerName());
-                String date = Helper.getTimeStamp(message.getMessageDate());
-                viewHolder.messengerDateTextView.setText(date);
+                if (mFirebaseUser.getDisplayName().equals(message.getMessagerName())) {
+                    viewHolder.rightLL.setVisibility(View.VISIBLE);
+                    viewHolder.leftLL.setVisibility(View.INVISIBLE);
+                    viewHolder.messageTextViewRgt.setText(message.getMessage());
+                    viewHolder.messengerTextViewRgt.setText(message.getMessagerName());
+                    String date = Helper.getChatTimeStamp(message.getMessageDate());
+                    viewHolder.messengerDateTextViewRgt.setText(date);
+                } else {
+                    viewHolder.leftLL.setVisibility(View.VISIBLE);
+                    viewHolder.rightLL.setVisibility(View.INVISIBLE);
+                    viewHolder.messageTextView.setText(message.getMessage());
+                    viewHolder.messengerTextView.setText(message.getMessagerName());
+                    String date = Helper.getChatTimeStamp(message.getMessageDate());
+                    viewHolder.messengerDateTextView.setText(date);
+                }
 //                if (message.getPhotoUrl() == null) {
 //                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(AskDoctorActivity.this,
 //                            R.drawable.ic_account_circle_black_36dp));
@@ -163,7 +188,7 @@ public class AskDoctorActivity extends AppCompatActivity {
         });
         recyclerViewChat.setLayoutManager(mLinearLayoutManager);
         recyclerViewChat.setAdapter(conversationAdapter);
-// Initialize Firebase Measurement.
+        // Initialize Firebase Measurement.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Initialize Firebase Remote Config.
@@ -189,38 +214,39 @@ public class AskDoctorActivity extends AppCompatActivity {
 
 //        messageEditText.setFilters(new InputFilter[]{
 //                new InputFilter.LengthFilter(mSharedPreferences
-//                        .getInt(CodelabPreferences.FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT))
+//                        .getInt(FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT))
 //        });
-//        messageEditText.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                if (charSequence.toString().trim().length() > 0) {
-//                    mSendButton.setEnabled(true);
-//                } else {
-//                    mSendButton.setEnabled(false);
-//                }
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-//            }
-//        });
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.toString().trim().length() > 0) {
+                    sendButton.setEnabled(true);
+                } else {
+                    sendButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (messageEditText.getText().toString().length() > 0) {
-                    if (mFirebaseUser.getDisplayName().equalsIgnoreCase("sarvan kumar")) {
-                        Message message = new Message(mUserID, messageEditText.getText().toString(), mFirebaseUser.getDisplayName(), System.currentTimeMillis());
+                    String timeStamp = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
+                    if (Helper.isAdminUsers(mFirebaseUser.getUid())) {
+                        Message message = new Message(mFirebaseUser.getUid(), messageEditText.getText().toString(), mFirebaseUser.getDisplayName(),timeStamp );
                         databaseReference.child(mUserID).child(MESSAGES_CHILD).push().setValue(message);
                         messageEditText.setText("");
                         mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
                     } else {
-                        Message message = new Message(mUserID, messageEditText.getText().toString(), mUserName, System.currentTimeMillis());
+                        Message message = new Message(mFirebaseUser.getUid(), messageEditText.getText().toString(), mUserName, timeStamp);
                         databaseReference.child(mUserID).child(MESSAGES_CHILD).push().setValue(message);
                         messageEditText.setText("");
                         mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
@@ -238,7 +264,6 @@ public class AskDoctorActivity extends AppCompatActivity {
                         realm.deleteAll();
                     }
                 });
-//                conversationAdapter.updateMessage();
                 Intent homeIntent = new Intent(AskDoctorActivity.this, HomeActivity.class);
                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(homeIntent);
@@ -249,7 +274,7 @@ public class AskDoctorActivity extends AppCompatActivity {
 
     private Action getMessageViewAction(Message friendlyMessage) {
         return new Action.Builder(Action.Builder.VIEW_ACTION)
-                .setObject(friendlyMessage.getMessagerName(), messageUrl.concat(friendlyMessage.getId()))
+                .setObject(friendlyMessage.getMessagerName(), messageUrl.concat(friendlyMessage.getUserId()))
                 .setMetadata(new Action.Metadata.Builder().setUpload(false))
                 .build();
     }
@@ -258,15 +283,15 @@ public class AskDoctorActivity extends AppCompatActivity {
         PersonBuilder sender = Indexables.personBuilder()
                 .setIsSelf(mUserName == friendlyMessage.getMessagerName())
                 .setName(friendlyMessage.getMessage())
-                .setUrl(messageUrl.concat(friendlyMessage.getId() + "/sender"));
+                .setUrl(messageUrl.concat(friendlyMessage.getUserId() + "/sender"));
 
         PersonBuilder recipient = Indexables.personBuilder()
                 .setName(mUserName)
-                .setUrl(messageUrl.concat(friendlyMessage.getId() + "/recipient"));
+                .setUrl(messageUrl.concat(friendlyMessage.getUserId() + "/recipient"));
 
         Indexable messageToIndex = Indexables.messageBuilder()
                 .setName(friendlyMessage.getMessage())
-                .setUrl(messageUrl.concat(friendlyMessage.getId()))
+                .setUrl(messageUrl.concat(friendlyMessage.getUserId()))
                 .setSender(sender)
                 .setRecipient(recipient)
                 .build();
@@ -307,7 +332,7 @@ public class AskDoctorActivity extends AppCompatActivity {
      */
     private void applyRetrievedLengthLimit() {
         Long friendly_msg_length = mFirebaseRemoteConfig.getLong("friendly_msg_length");
-        messageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
+//        messageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
         Log.d("AskDoctorActivity", "FML is: " + friendly_msg_length);
     }
 }

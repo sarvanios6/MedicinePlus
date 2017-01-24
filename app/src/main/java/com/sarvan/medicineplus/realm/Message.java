@@ -5,9 +5,9 @@ package com.sarvan.medicineplus.realm;
  */
 
 public class Message {
-    private String id;
+    private String userId;
     private String message;
-    private long messageDate;
+    private String messageDate;
     private String messagerName;
     private String departmentName;
     private String photoUrl;
@@ -15,19 +15,19 @@ public class Message {
     public Message() {
     }
 
-    public Message(String id, String message, String messagerName, long date) {
-        this.id = id;
+    public Message(String userId, String message, String messagerName, String date) {
+        this.userId = userId;
         this.message = message;
         this.messagerName = messagerName;
         this.messageDate = date;
     }
 
-    public String getId() {
-        return id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getMessage() {
@@ -38,11 +38,11 @@ public class Message {
         this.message = message;
     }
 
-    public long getMessageDate() {
+    public String getMessageDate() {
         return messageDate;
     }
 
-    public void setMessageDate(long messageDate) {
+    public void setMessageDate(String messageDate) {
         this.messageDate = messageDate;
     }
 

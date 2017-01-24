@@ -71,12 +71,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                         intent.putExtra("currentUser", currentUser);
                         intent.putExtra("departmentName", departmentName);
                         context.startActivity(intent);
-//                        String userId = firebaseUser.getUid();
-//                        Intent intent = new Intent(context, AskDoctorActivity.class);
-//                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                        intent.putExtra("userId", userId);
-//                        intent.putExtra("department", doctorNameList[getAdapterPosition()]);
-//                        context.startActivity(intent);
                     }
                 }
             });
@@ -85,5 +79,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
     public void updateList() {
         userList = Helper.getAllUsers(departmentName);
+        notifyDataSetChanged();
     }
 }
