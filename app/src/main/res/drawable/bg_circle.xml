@@ -4,7 +4,7 @@
     android:shape="oval">
 
     <solid
-        android:color="@color/colorPrimary"/>
+        android:color="@color/drawer_bg_text_color"/>
 
     <size
         android:width="120dp"

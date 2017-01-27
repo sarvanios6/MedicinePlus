@@ -9,12 +9,18 @@
     <color name="home_screen_button_color">#0dc7e1</color>
     <color name="home_screen_bottom_button_color">#0dc7e1</color>
     <color name="light_grey">#D3D3D3</color>
+    <color name="dark_grey">#c1bebe</color>
     <color name="grey">#eae8e8</color>
     <color name="white">#fcfcfc</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
     <color name="search_hint_color">#C0C0C0</color>
-    <color name="department_list_text_clr">#2d96e6</color>
+    <color name="department_list_text_clr">#0f3c5e</color>
     <color name="profile_text_color">#38a4f5</color>
+    <color name="drawer_border_color">#062f71</color>
+    <color name="drawer_bg_color">#577cf4</color>
+    <color name="drawer_bg_text_color">#ed3b88</color>
+    <color name="shadow_color">#8ab1adad</color>
+
 
 </resources>

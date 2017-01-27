@@ -4,34 +4,44 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/time_icon"
+            android:icon="@drawable/ic_home"
             android:title="Home" />
         <item
             android:id="@+id/nav_news"
-            android:icon="@drawable/time_icon"
+            android:icon="@drawable/ic_news"
             android:title="News" />
 
         <item
-            android:id="@+id/nav_settings"
-            android:title="settings" />
+            android:id="@+id/nav_comments"
+            android:icon="@drawable/ic_comment"
+            android:title="Comments" />
+        <item
+            android:id="@+id/nav_rate_us"
+            android:icon="@android:drawable/btn_star"
+            android:title="Rate Us" />
+        <item
+            android:id="@+id/nav_sign_out"
+            android:icon="@drawable/ic_exit"
+            android:title="Sign Out" />
         <item
             android:id="@+id/nav_about_us"
-            android:icon="@drawable/time_icon"
+            android:icon="@drawable/ic_about"
             android:title="About Us" />
         <item
-            android:id="@+id/nav_contact_us"
-            android:icon="@drawable/time_icon"
-            android:title="Privacy Policy" />
+            android:id="@+id/nav_privacy_policy"
+            android:icon="@drawable/ic_terms"
+            android:title="Terms and Conditions" />
     </group>
-
     <!--<item android:title="Other">-->
         <!--<menu>-->
             <!--<item-->
                 <!--android:id="@+id/nav_about_us"-->
+                <!--android:icon="@drawable/ic_about"-->
                 <!--android:title="About Us" />-->
             <!--<item-->
-                <!--android:id="@+id/nav_contact_us"-->
-                <!--android:title="Privacy Policy" />-->
+                <!--android:id="@+id/nav_privacy_policy"-->
+                <!--android:icon="@drawable/ic_terms"-->
+                <!--android:title="Terms and Conditions" />-->
         <!--</menu>-->
     <!--</item>-->
 </menu>

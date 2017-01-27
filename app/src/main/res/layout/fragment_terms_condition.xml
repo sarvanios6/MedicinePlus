@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/department_list_text_clr"
+        android:scaleType="centerCrop">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/head_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Terms and Conditions"
+                android:textColor="@color/home_screen_button_color"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/small_head_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/head_tv"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="@dimen/pad_10dp"
+                android:padding="@dimen/pad_10dp"
+                android:text="Terms and conditions to get MedicinePlus service:"
+                android:textColor="@color/home_screen_button_color"
+                android:textSize="22sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/small_head_tv"
+                android:layout_centerVertical="true"
+                android:padding="@dimen/pad_10dp"
+                android:text="Medicine plus provides health service through mobile app. Medicine plus service is run by the following terms and conditions.\n\n 1.Using Medicine plus mobile app implies that you agree with our terms and coditions. Our terms and conditions are changeable. Using app after any charge implies that you agree with it.\n\n 2.Medicine plus does not provide health consultation rather it provides technical infrastructure through which you can consult with doctors.\n\n 3.Doctors will provide consultation based on detailed description of your health problem. if you fail to present your problem properly, doctors will not be liable for any consequences. Medicine plus provides health service through mobile app. Medicine plus service is run by the following terms and conditions.\n\n 1.Using Medicine plus mobile app implies that you agree with our terms and coditions. Our terms and conditions are changeable. Using app after any charge implies that you agree with it.\n\n 2.Medicine plus does not provide health consultation rather it provides technical infrastructure through which you can consult with doctors.\n\n 3.Doctors will provide consultation based on detailed description of your health problem. if you fail to present your problem properly, doctors will not be liable for any consequences."
+                android:textColor="@color/home_screen_button_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

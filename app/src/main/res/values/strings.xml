@@ -10,10 +10,13 @@
     <string-array name="nav_item_activity_titles">
         <item>Home</item>
         <item>News</item>
-        <item>Settings</item>
+        <item>Comments</item>
+        <item>Rate Us</item>
+        <item>Sign Out</item>
         <item>ContactUs</item>
         <item>AboutUs</item>
 
     </string-array>
     <string name="sign_in">Sign In</string>
+
 </resources>

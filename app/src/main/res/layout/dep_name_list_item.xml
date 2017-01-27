@@ -2,25 +2,50 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="@dimen/pad_10dp"
-    android:weightSum="10">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/pad_10dp"
+    android:paddingRight="@dimen/pad_10dp"
+    android:paddingTop="@dimen/pad_10dp">
 
-    <ImageView
-        android:id="@+id/dep_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/medical_symbol" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:background="@drawable/sign_in_bg">
 
-    <TextView
-        android:id="@+id/doctor_name_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:text="Doctor_One"
-        android:textColor="@color/department_list_text_clr"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/dept_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            app:srcCompat="@android:drawable/sym_def_app_icon"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/dept_image"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/doctor_name_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Doctor_One"
+                style="@style/navigationemail"/>
+
+            <TextView
+                android:id="@+id/doctor_desc_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/doctor_name_tv"
+                android:layout_marginLeft="10dp"
+                android:ellipsize="end"
+                android:text="Treating patients suffering from all types of medical condition."
+                android:textColor="@color/home_screen_button_color"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </RelativeLayout>
 </LinearLayout>

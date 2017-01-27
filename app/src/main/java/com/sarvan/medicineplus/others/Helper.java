@@ -8,8 +8,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,7 +25,6 @@ import com.sarvan.medicineplus.realm.UsersRealm;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -31,12 +32,17 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
- * Created by Sarvan on 30/11/16.
+ * Helper Class use for some default methods
  */
 
 public class Helper {
 
-    public static void stockInfoDialog(final Context context) {
+    /**
+     * SignIN Dialogue
+     *
+     * @param context context
+     */
+    public static void signInDialog(final Context context) {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser == null) {
             // Not signed in, launch the Sign In activity
@@ -65,11 +71,51 @@ public class Helper {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Please enter your Email and Pwd", Toast.LENGTH_SHORT).show();
+                if (inputEmail.getText().length() < 0 && inputPwd.getText().length() < 0) {
+                    Toast.makeText(context, "Please enter your Email and Pwd", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         // Set Data
         signInDialog.show();
+    }
+
+    /**
+     * ShowComment Dialogue
+     *
+     * @param context context
+     */
+    public static void showCommentDialog(final Context context) {
+        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = layoutInflater.inflate(R.layout.fragment_comments, null);
+        final Dialog showDialog = new Dialog(context);
+        showDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        showDialog.setContentView(view);
+        showDialog.setCanceledOnTouchOutside(false);
+        showDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        // Get All Views
+        final EditText commentEditText = (EditText) view.findViewById(R.id.enter_comments_edit_txt);
+        final RelativeLayout editTextLayout = (RelativeLayout) view.findViewById(R.id.edit_comment_layout);
+        final Button postCmtBtn = (Button) view.findViewById(R.id.post_comment_btn);
+        commentEditText.setSelection(commentEditText.getText().toString().length());
+        editTextLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commentEditText.requestFocus();
+                commentEditText.setFocusableInTouchMode(true);
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(commentEditText, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+        postCmtBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog.dismiss();
+                commentEditText.setText("");
+            }
+        });
+        // Set Data
+        showDialog.show();
     }
 
     /**
@@ -141,7 +187,7 @@ public class Helper {
     // Get Admin User
     public static boolean isAdminUsers(String id) {
         Realm realm = Realm.getDefaultInstance();
-        DoctorRealm adminUserRealm = realm.where(DoctorRealm.class).equalTo("channel",id).findFirst();
+        DoctorRealm adminUserRealm = realm.where(DoctorRealm.class).equalTo("channel", id).findFirst();
         if (null != adminUserRealm) {
             return true;
         } else {
@@ -159,6 +205,7 @@ public class Helper {
             return false;
         }
     }
+
     // Get All users
     public static ArrayList<UsersRealm> getAllUsers(String departmentName) {
         ArrayList<UsersRealm> users = new ArrayList<>();

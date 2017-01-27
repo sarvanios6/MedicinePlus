@@ -1,9 +1,12 @@
 package com.sarvan.medicineplus.activity;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -36,7 +39,7 @@ import com.sarvan.medicineplus.fragment.AboutUsFragment;
 import com.sarvan.medicineplus.fragment.ContactUsFragment;
 import com.sarvan.medicineplus.fragment.HomeFragment;
 import com.sarvan.medicineplus.fragment.NewsFragment;
-import com.sarvan.medicineplus.fragment.SettingFragment;
+import com.sarvan.medicineplus.others.CircleTransForm;
 import com.sarvan.medicineplus.others.Helper;
 import com.sarvan.medicineplus.realm.DoctorRealm;
 import com.sarvan.medicineplus.realm.Users;
@@ -48,7 +51,6 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private NavigationView navigationView;
     private DrawerLayout drawer;
-    private View navHeader;
     private RelativeLayout headerContainer;
     private TextView txtName, txtWebsite;
     private Toolbar toolbar;
@@ -58,14 +60,13 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final String TAG = "HomeActivity";
     private static final String TAG_HOME = "home";
     private static final String TAG_NEWS = "news";
-    private static final String TAG_SETTINGS = "settings";
+    private static final String TAG_COMMENT = "comments";
+    private static final String TAG_RATE_US = "rate_us";
+    private static final String TAG_SIGN_OUT = "sign_out";
     private static final String TAG_ABOUT_US = "about_us";
-    private static final String TAG_CONTACT_US = "contact_us";
+    private static final String TAG_TERMS_CODITIONS = "terms_conditions";
     public static String CURRENT_TAG = TAG_HOME;
     private static final String ADMIN_TAG = "Admin";
-
-    private static final String urlNavHeaderBg = "http://www.noormedical.com/files/credentialing.jpg";
-    private static final String urlProfileImg = "https://cdn6.f-cdn.com/ppic/42449860/logo/10996896/wrUMb/profile_logo_.jpg";
 
     // index to identify current nav menu item
     public static int navItemIndex = 0;
@@ -74,7 +75,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     // flag to load home fragment when user presses back key
     private boolean shouldLoadHomeFragOnBackPress = true;
     private Handler mHandler;
-    private ImageView imgNavHeaderBg;
+    private ImageView imgNavHeaderBg, imageProfile, imageAppProfile, imageMedicalSymbol;
     private FirebaseDatabase firebaseInstance;
     private DatabaseReference mFirebaseDatabaseRef;
     private FirebaseAuth mFirebaseAuth;
@@ -83,6 +84,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private Realm realm;
     private UsersRealm usersRealm;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,7 +138,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String adminUserId = (String) dataSnapshot.getValue();
                     if (mFirebaseUser.getUid().equals(adminUserId)) {
-                        DoctorRealm adminUser = new DoctorRealm(adminUserId, mFirebaseUser.getDisplayName(), mFirebaseUser.getPhotoUrl().toString(),"department","Admin");
+                        DoctorRealm adminUser = new DoctorRealm(adminUserId, mFirebaseUser.getDisplayName(), mFirebaseUser.getPhotoUrl().toString(), "department", "Admin");
                         realm.beginTransaction();
                         realm.copyToRealmOrUpdate(adminUser);
                         realm.commitTransaction();
@@ -178,15 +180,18 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void navigationViewInit() {
         // Navigation view Header
-        navHeader = navigationView.getHeaderView(0);
+        View navHeader = navigationView.getHeaderView(0);
         txtName = (TextView) navHeader.findViewById(R.id.user_name_tv);
         txtWebsite = (TextView) navHeader.findViewById(R.id.user_email_tv);
         headerContainer = (RelativeLayout) navHeader.findViewById(R.id.header_view_container);
         imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
+        imageProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
+        imageAppProfile = (ImageView) navHeader.findViewById(R.id.img_app_profile);
+        imageMedicalSymbol = (ImageView) navHeader.findViewById(R.id.img_medical_symbol);
         headerContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Helper.stockInfoDialog(HomeActivity.this);
+                Helper.signInDialog(HomeActivity.this);
                 drawer.closeDrawers();
             }
         });
@@ -199,8 +204,9 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
      * like background image, profile image
      * name, website, notifications action view (dot)
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void loadNavHeader() {
-        txtName.setText("MedicinePlus");
+        txtName.setText(this.getResources().getString(R.string.app_name));
         String userEmail = "No Email";
         // check user availability
         if (mFirebaseUser != null) {
@@ -208,20 +214,36 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         }
         txtWebsite.setText(userEmail);
         // loading header background image
-        Glide.with(this).load(urlNavHeaderBg)
-                .crossFade()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(imgNavHeaderBg);
-
-        // Loading profile image
-//        Glide.with(this).load(urlProfileImg)
+//        Glide.with(this).load(urlNavHeaderBg)
 //                .crossFade()
-//                .thumbnail(0.5f)
-//                .bitmapTransform(new CircleTransForm(this))
 //                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .into(imgProfile);
+//                .into(imgNavHeaderBg);
+        // Loading profile image
+        Glide.with(this).load("android.resource://com.sarvan.medicineplus/drawable/medical_symbol")
+                .crossFade()
+                .thumbnail(0.5f)
+                .bitmapTransform(new CircleTransForm(this))
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imageAppProfile);
+
+        Glide.with(this).load("android.resource://com.sarvan.medicineplus/drawable/medical_logo")
+                .crossFade()
+                .thumbnail(0.5f)
+                .bitmapTransform(new CircleTransForm(this))
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imageMedicalSymbol);
+
+        Uri uriProfileImage = mFirebaseUser.getPhotoUrl();
+        // Loading profile image
+        Glide.with(this).load(uriProfileImage)
+                .crossFade()
+                .thumbnail(0.5f)
+                .bitmapTransform(new CircleTransForm(this))
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imageProfile);
 
         // showing dot next to notifications label
+        navigationView.getMenu().getItem(2).setActionView(R.layout.menu_dot);
         navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
     }
 
@@ -304,12 +326,18 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                 // news fragment
                 return new NewsFragment();
             case 2:
-                // settings fragment
-                return new SettingFragment();
+                // comments dialog box
+//                return new CommentsFragment();
+                Helper.showCommentDialog(this);
+                return new HomeFragment();
             case 3:
+                return new NewsFragment();
+            case 4:
+                return new HomeFragment();
+            case 5:
                 // aboutUs fragment
                 return new AboutUsFragment();
-            case 4:
+            case 6:
                 // contactUs fragment
                 return new ContactUsFragment();
             default:
@@ -339,17 +367,25 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_NEWS;
                         break;
-                    case R.id.nav_settings:
+                    case R.id.nav_comments:
                         navItemIndex = 2;
-                        CURRENT_TAG = TAG_SETTINGS;
+                        CURRENT_TAG = TAG_COMMENT;
+                        break;
+                    case R.id.nav_rate_us:
+                        navItemIndex = 3;
+                        CURRENT_TAG = TAG_RATE_US;
+                        break;
+                    case R.id.nav_sign_out:
+                        navItemIndex = 4;
+                        CURRENT_TAG = TAG_SIGN_OUT;
                         break;
                     case R.id.nav_about_us:
-                        navItemIndex = 3;
+                        navItemIndex = 5;
                         CURRENT_TAG = TAG_ABOUT_US;
                         break;
-                    case R.id.nav_contact_us:
-                        navItemIndex = 4;
-                        CURRENT_TAG = TAG_CONTACT_US;
+                    case R.id.nav_privacy_policy:
+                        navItemIndex = 6;
+                        CURRENT_TAG = TAG_TERMS_CODITIONS;
                         break;
                     default:
                         navItemIndex = 0;
@@ -378,6 +414,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                 super.onDrawerClosed(drawerView);
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
@@ -416,13 +453,14 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         super.onBackPressed();
     }
 
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onResume() {
         super.onResume();
         loadNavHeader();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onStart() {
         super.onStart();
