@@ -21,12 +21,24 @@
         android:textAppearance="@style/navigationtitle" />
 
     <TextView
+        android:id="@+id/email_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/web_tv"
+        android:layout_below="@+id/web_tv"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="@dimen/pad_10dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:text="Email : medicineplus@gmail.com"
+        android:textAppearance="@style/navigationemail" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/email_tv"
         android:layout_centerVertical="true"
         android:layout_marginTop="@dimen/pad_10dp"
         android:gravity="center"
         android:text="Contact : 0123456789"
-        android:textAppearance="@style/navigationtitle" />
+        android:textAppearance="@style/navigationemail" />
 </RelativeLayout>

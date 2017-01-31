@@ -1,50 +1,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/sign_in_bg"
-    android:orientation="vertical"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     android:scrollbars="vertical">
-
-    <ImageView
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/pad_10dp"
-        android:src="@drawable/medical_symbol"/>
-
-    <RelativeLayout
-        android:id="@+id/edit_comment_layout"
-        android:layout_width="320dp"
-        android:layout_height="142dp"
-        android:layout_marginBottom="@dimen/pad_10dp"
-        android:layout_marginEnd="@dimen/pad_5dp"
-        android:layout_marginLeft="@dimen/pad_5dp"
-        android:layout_marginRight="@dimen/pad_5dp"
-        android:layout_marginStart="@dimen/pad_5dp"
-        android:layout_gravity="center"
-        android:background="@color/white"
-        android:padding="@dimen/pad_5dp">
-
-        <EditText
-            android:id="@+id/enter_comments_edit_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:hint="Enter your comments..."
-            android:scrollbars="vertical"
-            android:textColor="@color/black" />
-    </RelativeLayout>
 
     <Button
         android:id="@+id/post_comment_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/pad_10dp"
         android:layout_marginBottom="@dimen/pad_10dp"
+        android:layout_marginTop="@dimen/pad_10dp"
         android:background="@drawable/home_button_selector"
         android:padding="@dimen/pad_10dp"
-        android:text="Post Comment"
+        android:text="Comment"
         android:textColor="@color/home_screen_button_color" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/commets_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>

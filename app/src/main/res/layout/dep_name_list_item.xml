@@ -44,7 +44,7 @@
                 android:layout_marginLeft="10dp"
                 android:ellipsize="end"
                 android:text="Treating patients suffering from all types of medical condition."
-                android:textColor="@color/home_screen_button_color"
+                android:textColor="@color/white"
                 android:textSize="12sp" />
         </RelativeLayout>
     </RelativeLayout>

@@ -73,11 +73,13 @@ public class DepartmentListAdapter extends RecyclerView.Adapter<DepartmentListAd
         return doctorDepartmentList.size();
     }
 
+    // DepartmentName View Holder Class Definition
     public class DepartmentNameViewHolder extends RecyclerView.ViewHolder {
         private TextView docterDeptName;
         private TextView docterDeptDesc;
         private ImageView departmentImageView;
 
+        // Constructor
         public DepartmentNameViewHolder(View view) {
             super(view);
             docterDeptName = (TextView) view.findViewById(R.id.doctor_name_tv);

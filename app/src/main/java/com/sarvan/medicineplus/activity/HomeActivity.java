@@ -27,6 +27,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -36,11 +38,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sarvan.medicineplus.R;
 import com.sarvan.medicineplus.fragment.AboutUsFragment;
+import com.sarvan.medicineplus.fragment.CommentsFragment;
 import com.sarvan.medicineplus.fragment.ContactUsFragment;
 import com.sarvan.medicineplus.fragment.HomeFragment;
 import com.sarvan.medicineplus.fragment.NewsFragment;
+import com.sarvan.medicineplus.others.AppRater;
 import com.sarvan.medicineplus.others.CircleTransForm;
-import com.sarvan.medicineplus.others.Helper;
 import com.sarvan.medicineplus.realm.DoctorRealm;
 import com.sarvan.medicineplus.realm.Users;
 import com.sarvan.medicineplus.realm.UsersRealm;
@@ -75,7 +78,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     // flag to load home fragment when user presses back key
     private boolean shouldLoadHomeFragOnBackPress = true;
     private Handler mHandler;
-    private ImageView imgNavHeaderBg, imageProfile, imageAppProfile, imageMedicalSymbol;
+    private ImageView imageProfile, imageAppProfile, imageMedicalSymbol;
     private FirebaseDatabase firebaseInstance;
     private DatabaseReference mFirebaseDatabaseRef;
     private FirebaseAuth mFirebaseAuth;
@@ -184,14 +187,27 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         txtName = (TextView) navHeader.findViewById(R.id.user_name_tv);
         txtWebsite = (TextView) navHeader.findViewById(R.id.user_email_tv);
         headerContainer = (RelativeLayout) navHeader.findViewById(R.id.header_view_container);
-        imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
         imageProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
         imageAppProfile = (ImageView) navHeader.findViewById(R.id.img_app_profile);
         imageMedicalSymbol = (ImageView) navHeader.findViewById(R.id.img_medical_symbol);
         headerContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Helper.signInDialog(HomeActivity.this);
+                Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        realm.deleteAll();
+                    }
+                });
+                // Google sign out
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(@NonNull Status status) {
+                                startActivity(new Intent(HomeActivity.this, SignInActivity.class));
+                                finish();
+                            }
+                        });
                 drawer.closeDrawers();
             }
         });
@@ -327,13 +343,27 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                 return new NewsFragment();
             case 2:
                 // comments dialog box
-//                return new CommentsFragment();
-                Helper.showCommentDialog(this);
-                return new HomeFragment();
+                return new CommentsFragment();
             case 3:
-                return new NewsFragment();
-            case 4:
+                //
+                AppRater.app_launched(this);
                 return new HomeFragment();
+            case 4:
+                Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        realm.deleteAll();
+                    }
+                });
+                // Google sign out
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(@NonNull Status status) {
+                                startActivity(new Intent(HomeActivity.this, SignInActivity.class));
+                                finish();
+                            }
+                        });
             case 5:
                 // aboutUs fragment
                 return new AboutUsFragment();

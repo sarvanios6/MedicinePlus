@@ -1,10 +1,12 @@
 package com.sarvan.medicineplus.others;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -16,9 +18,16 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sarvan.medicineplus.R;
 import com.sarvan.medicineplus.activity.SignInActivity;
+import com.sarvan.medicineplus.adapter.CommentsAdapter;
 import com.sarvan.medicineplus.realm.ChatMessage;
+import com.sarvan.medicineplus.realm.CommentsModel;
 import com.sarvan.medicineplus.realm.DoctorRealm;
 import com.sarvan.medicineplus.realm.UsersRealm;
 
@@ -85,9 +94,11 @@ public class Helper {
      *
      * @param context context
      */
-    public static void showCommentDialog(final Context context) {
+    public static void showCommentDialog(final Context context, final CommentsAdapter adapter, final FirebaseUser mFirebaseUser) {
+        FirebaseDatabase firebaseInstance = FirebaseDatabase.getInstance();
+        final DatabaseReference mFirebaseDatabaseRef = firebaseInstance.getReference("Comments");
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.fragment_comments, null);
+        View view = layoutInflater.inflate(R.layout.comments_dialog_layout, null);
         final Dialog showDialog = new Dialog(context);
         showDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         showDialog.setContentView(view);
@@ -110,8 +121,35 @@ public class Helper {
         postCmtBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog.dismiss();
-                commentEditText.setText("");
+                String text = commentEditText.getText().toString();
+                if (text.length() > 0) {
+                    String userID = null;
+                    if (mFirebaseUser != null) {
+                        userID = mFirebaseUser.getUid();
+                        String timeStamps = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
+                        CommentsModel commentsModel = new CommentsModel(text, timeStamps, mFirebaseUser.getDisplayName(), userID);
+                        mFirebaseDatabaseRef.push().setValue(commentsModel);
+                    }
+                    mFirebaseDatabaseRef.addValueEventListener(new ValueEventListener() {
+
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            adapter.clearComments();
+                            for (DataSnapshot snapshots : dataSnapshot.getChildren()) {
+                                CommentsModel commentsModel = snapshots.getValue(CommentsModel.class);
+                                adapter.updateCommets(commentsModel);
+                            }
+                            adapter.notifyDataSetChanged();
+                            showDialog.dismiss();
+                            commentEditText.setText("");
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.i("CommentsFragment", databaseError.getMessage());
+                        }
+                    });
+                }
             }
         });
         // Set Data
@@ -123,6 +161,7 @@ public class Helper {
      *
      * @return timeStamp Time difference current time and date and date of post.
      */
+    @SuppressLint("SimpleDateFormat")
     public static String getChatTimeStamp(String timeStamp) {
         // Getting date and time from JSON
         TimeZone currentTimeZone = TimeZone.getDefault();
@@ -239,5 +278,10 @@ public class Helper {
         } else {
             return sdf.format(resultdate);
         }
+    }
+
+    public static UsersRealm getUser() {
+        Realm realm = Realm.getDefaultInstance();
+        return realm.where(UsersRealm.class).findFirst();
     }
 }
