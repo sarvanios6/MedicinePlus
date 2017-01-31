@@ -92,7 +92,7 @@ public class DepartmentListAdapter extends RecyclerView.Adapter<DepartmentListAd
                     if (firebaseUser == null) {
                         // Not signed in, launch the Sign In activity
                         context.startActivity(new Intent(context, SignInActivity.class));
-                    } else if (Helper.isAdminUsers(firebaseUser.getUid())) {
+                    } else if (Helper.isAdminUsers()) {
                         String userId = firebaseUser.getUid();
                         Intent intent = new Intent(context, UsersListActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

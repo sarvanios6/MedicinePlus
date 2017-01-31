@@ -69,7 +69,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final String TAG_ABOUT_US = "about_us";
     private static final String TAG_TERMS_CODITIONS = "terms_conditions";
     public static String CURRENT_TAG = TAG_HOME;
-    private static final String ADMIN_TAG = "Admin";
+    private static final String ADMIN_TAG = "Admins";
 
     // index to identify current nav menu item
     public static int navItemIndex = 0;
@@ -136,7 +136,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         // Admin user Upadated
         if (mFirebaseUser != null) {
             // update user list name
-            mFirebaseDatabaseRef.child(MEDICINE_PLUS).child(ADMIN_TAG).addValueEventListener(new ValueEventListener() {
+            mFirebaseDatabaseRef.child(MEDICINE_PLUS).child(ADMIN_TAG).child(mFirebaseUser.getDisplayName()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String adminUserId = (String) dataSnapshot.getValue();
@@ -193,21 +193,21 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         headerContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        realm.deleteAll();
-                    }
-                });
-                // Google sign out
-                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                        new ResultCallback<Status>() {
-                            @Override
-                            public void onResult(@NonNull Status status) {
-                                startActivity(new Intent(HomeActivity.this, SignInActivity.class));
-                                finish();
-                            }
-                        });
+//                Realm.getDefaultInstance().executeTransaction(new Realm.Transaction() {
+//                    @Override
+//                    public void execute(Realm realm) {
+//                        realm.deleteAll();
+//                    }
+//                });
+//                // Google sign out
+//                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+//                        new ResultCallback<Status>() {
+//                            @Override
+//                            public void onResult(@NonNull Status status) {
+//                                startActivity(new Intent(HomeActivity.this, SignInActivity.class));
+//                                finish();
+//                            }
+//                        });
                 drawer.closeDrawers();
             }
         });
@@ -345,7 +345,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                 // comments dialog box
                 return new CommentsFragment();
             case 3:
-                //
+                // home Fragment
                 AppRater.app_launched(this);
                 return new HomeFragment();
             case 4:

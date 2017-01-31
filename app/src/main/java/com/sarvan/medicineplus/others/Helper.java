@@ -29,6 +29,8 @@ import com.sarvan.medicineplus.adapter.CommentsAdapter;
 import com.sarvan.medicineplus.realm.ChatMessage;
 import com.sarvan.medicineplus.realm.CommentsModel;
 import com.sarvan.medicineplus.realm.DoctorRealm;
+import com.sarvan.medicineplus.realm.NewsModel;
+import com.sarvan.medicineplus.realm.NewsRealm;
 import com.sarvan.medicineplus.realm.UsersRealm;
 
 import java.text.ParseException;
@@ -224,10 +226,10 @@ public class Helper {
     }
 
     // Get Admin User
-    public static boolean isAdminUsers(String id) {
+    public static boolean isAdminUsers() {
         Realm realm = Realm.getDefaultInstance();
-        DoctorRealm adminUserRealm = realm.where(DoctorRealm.class).equalTo("channel", id).findFirst();
-        if (null != adminUserRealm) {
+        RealmResults<DoctorRealm> adminUserRealm = realm.where(DoctorRealm.class).findAll();
+        if (null != adminUserRealm && adminUserRealm.size() > 0) {
             return true;
         } else {
             return false;
@@ -280,8 +282,37 @@ public class Helper {
         }
     }
 
-    public static UsersRealm getUser() {
+    /**
+     * Get user Realm
+     *
+     * @return userData
+     */
+    public static DoctorRealm getAdminUser() {
         Realm realm = Realm.getDefaultInstance();
-        return realm.where(UsersRealm.class).findFirst();
+        return realm.where(DoctorRealm.class).findFirst();
+    }
+
+    public static ArrayList<NewsModel> getAllNewsFromRealm() {
+        ArrayList<NewsModel> allNews = new ArrayList<>();
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<NewsRealm> newsListRealm = realm.where(NewsRealm.class).findAll();
+        for (NewsRealm model : newsListRealm) {
+            NewsModel newsModle = new NewsModel(model.getId(), model.getDrName(), model.getNewsText(), model.getTime());
+            allNews.add(newsModle);
+        }
+        return allNews;
+    }
+
+    /**
+     * Clear data from Realm
+     */
+    public static void clearNewsFromRealm() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.where(NewsRealm.class).findAll().deleteAllFromRealm();
+            }
+        });
     }
 }

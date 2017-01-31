@@ -96,7 +96,7 @@ public class AskDoctorActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (intent != null && mFirebaseUser != null) {
-            if (Helper.isAdminUsers(mFirebaseUser.getUid())) {
+            if (Helper.isAdminUsers()) {
                 mUserID = intent.getStringExtra("currentUser");
                 departmentName = intent.getStringExtra("departmentName");
                 messageUrl = messageUrl + departmentName + mUserID + "/messages/";
@@ -240,7 +240,7 @@ public class AskDoctorActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (messageEditText.getText().toString().length() > 0) {
                     String timeStamp = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
-                    if (Helper.isAdminUsers(mFirebaseUser.getUid())) {
+                    if (Helper.isAdminUsers()) {
                         Message message = new Message(mFirebaseUser.getUid(), messageEditText.getText().toString(), mFirebaseUser.getDisplayName(),timeStamp );
                         databaseReference.child(mUserID).child(MESSAGES_CHILD).push().setValue(message);
                         messageEditText.setText("");

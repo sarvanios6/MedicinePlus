@@ -19,4 +19,7 @@
     </string-array>
     <string name="sign_in">Sign In</string>
 
+    <!--Alert Dialog-->
+    <string name="negative_button">Cancel</string>
+    <string name="positive_button_string">Delete</string>
 </resources>
